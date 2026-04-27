@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wada Sanzo · A Dictionary of Color Combinations</title>
+  <style>
+    :root {
+      --bg: #f5f2ed;
+      --surface: #ffffff;
+      --border: #e0dbd3;
+      --text: #1a1917;
+      --muted: #7c756e;
+      --accent: #1c1c1c;
+      --radius: 6px;
+      --shadow: 0 1px 8px rgba(0,0,0,0.07);
+      --header-h: 58px;
+      --controls-h: 54px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── Header ──────────────────────────────────────────────── */
+    header {
+      height: var(--header-h);
+      background: var(--accent);
+      color: #f5f2ed;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      gap: 20px;
+      flex-shrink: 0;
+    }
+
+    .header-brand h1 {
+      font-size: 1.05rem;
+      font-weight: normal;
+      letter-spacing: 0.03em;
+    }
+
+    .header-brand p {
+      font-size: 0.65rem;
+      font-family: sans-serif;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      opacity: 0.5;
+      margin-top: 2px;
+    }
+
+    nav { display: flex; gap: 4px; }
+
+    nav button {
+      font-family: sans-serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.05em;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.18);
+      color: rgba(255,255,255,0.7);
+      padding: 6px 14px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    nav button:hover, nav button.active {
+      background: rgba(255,255,255,0.13);
+      color: #fff;
+      border-color: rgba(255,255,255,0.3);
+    }
+
+    /* ── Views ───────────────────────────────────────────────── */
+    .view { display: none; }
+    .view.active { display: flex; }
+
+    /* ── Gallery View ─────────────────────────────────────────── */
+    #galleryView {
+      flex-direction: column;
+      height: calc(100vh - var(--header-h));
+      overflow: hidden;
+    }
+
+    .controls {
+      height: var(--controls-h);
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 32px;
+      flex-shrink: 0;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      max-width: 320px;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+    }
+
+    .search-wrap input {
+      width: 100%;
+      padding: 7px 10px 7px 32px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.85rem;
+      font-family: sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .search-wrap input:focus { border-color: var(--accent); }
+
+    .divider { width: 1px; height: 22px; background: var(--border); flex-shrink: 0; }
+
+    .sort-label {
+      font-family: sans-serif;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .btn-group { display: flex; gap: 3px; }
+
+    .btn-group button {
+      font-family: sans-serif;
+      font-size: 0.75rem;
+      padding: 5px 11px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-group button:hover { border-color: var(--accent); color: var(--text); }
+    .btn-group button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    .count-info {
+      margin-left: auto;
+      font-family: sans-serif;
+      font-size: 0.75rem;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    /* ── Gallery + Detail layout ──────────────────────────────── */
+    .gallery-body {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .gallery-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 32px;
+    }
+
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+      gap: 10px;
+    }
+
+    .color-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      border: 2px solid transparent;
+      box-shadow: var(--shadow);
+      transition: transform 0.12s, border-color 0.12s, box-shadow 0.12s;
+    }
+
+    .color-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.11); }
+    .color-card.selected { border-color: var(--accent); }
+
+    .card-swatch { height: 72px; }
+
+    .card-body { padding: 7px 8px 8px; }
+
+    .card-name {
+      font-size: 0.68rem;
+      font-weight: 600;
+      font-family: sans-serif;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--text);
+    }
+
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 3px;
+    }
+
+    .card-hex {
+      font-size: 0.6rem;
+      font-family: monospace;
+      color: var(--muted);
+    }
+
+    .card-score {
+      font-size: 0.58rem;
+      font-family: sans-serif;
+      color: var(--muted);
+      background: var(--bg);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
+    /* ── Detail Panel ─────────────────────────────────────────── */
+    .detail-panel {
+      width: 360px;
+      flex-shrink: 0;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .detail-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--muted);
+      font-family: sans-serif;
+      font-size: 0.85rem;
+      gap: 10px;
+      padding: 40px;
+      text-align: center;
+    }
+
+    .detail-empty-icon { font-size: 2.5rem; opacity: 0.3; }
+
+    .detail-inner {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .detail-swatch { height: 150px; flex-shrink: 0; position: relative; }
+
+    .detail-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.25);
+      border: none;
+      color: white;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+
+    .detail-close:hover { background: rgba(0,0,0,0.45); }
+
+    .detail-scroll { flex: 1; overflow-y: auto; padding: 16px 18px; }
+
+    .detail-name { font-size: 1.25rem; font-weight: normal; line-height: 1.3; }
+
+    .detail-index {
+      font-family: sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .codes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin: 12px 0;
+    }
+
+    .code-pill {
+      background: var(--bg);
+      border-radius: var(--radius);
+      padding: 7px 8px;
+      cursor: pointer;
+      transition: background 0.15s;
+      border: 1px solid transparent;
+    }
+
+    .code-pill:hover { background: var(--border); }
+    .code-pill:active { border-color: var(--accent); }
+
+    .code-pill-label {
+      font-family: sans-serif;
+      font-size: 0.58rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+
+    .code-pill-value {
+      font-family: monospace;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-top: 2px;
+      word-break: break-all;
+    }
+
+    .section-heading {
+      font-family: sans-serif;
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+      margin: 16px 0 8px;
+    }
+
+    /* Versatility */
+    .versatility-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+    }
+
+    .v-score {
+      font-size: 1.8rem;
+      font-weight: 700;
+      font-family: sans-serif;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .v-info { flex: 1; min-width: 0; }
+
+    .v-label {
+      font-family: sans-serif;
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+
+    .v-bar { height: 4px; background: var(--border); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+    .v-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s; }
+
+    /* Combinations */
+    .combo-list { display: flex; flex-direction: column; gap: 5px; }
+
+    .combo-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 8px;
+      border-radius: var(--radius);
+      background: var(--bg);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .combo-row:hover { background: var(--border); }
+
+    .combo-swatches {
+      display: flex;
+      border-radius: 4px;
+      overflow: hidden;
+      flex-shrink: 0;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+
+    .combo-swatch { width: 24px; height: 32px; }
+
+    .combo-meta { flex: 1; min-width: 0; }
+
+    .combo-id {
+      font-family: sans-serif;
+      font-size: 0.6rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .combo-names {
+      font-size: 0.68rem;
+      line-height: 1.4;
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Similar colors */
+    .similar-row { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .similar-chip {
+      cursor: pointer;
+      border-radius: 4px;
+      overflow: hidden;
+      width: 58px;
+      flex-shrink: 0;
+      border: 2px solid transparent;
+      transition: transform 0.12s, border-color 0.12s;
+    }
+
+    .similar-chip:hover { transform: scale(1.06); border-color: var(--muted); }
+
+    .similar-chip-swatch { height: 38px; }
+
+    .similar-chip-name {
+      font-family: sans-serif;
+      font-size: 0.56rem;
+      padding: 2px 4px 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--muted);
+      background: var(--surface);
+    }
+
+    /* ── Upload View ──────────────────────────────────────────── */
+    #uploadView {
+      flex-direction: column;
+      height: calc(100vh - var(--header-h));
+      overflow-y: auto;
+      padding: 32px;
+      align-items: flex-start;
+      justify-content: flex-start;
+    }
+
+    .upload-inner { max-width: 880px; width: 100%; margin: 0 auto; }
+
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 48px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      font-family: sans-serif;
+    }
+
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--accent);
+      background: rgba(0,0,0,0.015);
+    }
+
+    .upload-icon { font-size: 2.8rem; margin-bottom: 12px; }
+    .upload-title { font-size: 1.05rem; color: var(--text); margin-bottom: 6px; }
+    .upload-hint { font-size: 0.82rem; color: var(--muted); }
+
+    .upload-btn-row { margin-top: 14px; }
+
+    .btn-primary {
+      font-family: sans-serif;
+      font-size: 0.82rem;
+      padding: 8px 20px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .btn-primary:hover { opacity: 0.8; }
+
+    .canvas-area {
+      display: flex;
+      gap: 24px;
+      margin-top: 24px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .canvas-wrap { flex: 1; min-width: 280px; }
+
+    #imageCanvas {
+      max-width: 100%;
+      display: block;
+      border-radius: var(--radius);
+      cursor: crosshair;
+      box-shadow: var(--shadow);
+    }
+
+    .canvas-hint {
+      font-family: sans-serif;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    .sample-result { width: 260px; flex-shrink: 0; font-family: sans-serif; }
+
+    .sample-display {
+      display: flex;
+      gap: 12px;
+      padding: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+    }
+
+    .sample-swatch { width: 52px; height: 52px; border-radius: 4px; flex-shrink: 0; }
+
+    .sample-info { flex: 1; min-width: 0; }
+    .sample-label { font-size: 0.6rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+    .sample-hex { font-family: monospace; font-size: 1rem; font-weight: 600; margin-top: 2px; }
+    .sample-rgb { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+
+    .match-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+    }
+
+    .match-header {
+      font-size: 0.6rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 10px;
+    }
+
+    .match-color-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .match-swatch { width: 44px; height: 44px; border-radius: 4px; flex-shrink: 0; }
+    .match-name { font-size: 0.88rem; font-family: Georgia, serif; }
+    .match-hex { font-size: 0.7rem; font-family: monospace; color: var(--muted); margin-top: 2px; }
+
+    .match-view-btn {
+      display: block;
+      width: 100%;
+      margin-top: 12px;
+      font-family: sans-serif;
+      font-size: 0.78rem;
+      text-align: center;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 7px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .match-view-btn:hover { background: var(--border); }
+
+    .upload-placeholder {
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-style: italic;
+    }
+
+    /* ── Toast ────────────────────────────────────────────────── */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(60px);
+      background: var(--accent);
+      color: white;
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-family: sans-serif;
+      font-size: 0.8rem;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.2s ease;
+    }
+
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ── Scrollbar ────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ── No results ───────────────────────────────────────────── */
+    .no-results {
+      grid-column: 1 / -1;
+      padding: 60px 20px;
+      text-align: center;
+      font-family: sans-serif;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-brand">
+    <h1>Wada Sanzo</h1>
+    <p>A Dictionary of Color Combinations · 348 Palettes</p>
+  </div>
+  <nav>
+    <button id="navGallery" class="active" onclick="showView('gallery')">Gallery</button>
+    <button id="navUpload" onclick="showView('upload')">Image Match</button>
+  </nav>
+</header>
+
+<!-- ── Gallery View ──────────────────────────────────────────── -->
+<div id="galleryView" class="view active">
+  <div class="controls">
+    <div class="search-wrap">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" id="searchInput" placeholder="Search by name or hex…" oninput="filterColors()">
+    </div>
+    <div class="divider"></div>
+    <span class="sort-label">Sort</span>
+    <div class="btn-group">
+      <button id="sortName" onclick="setSort('name')">Name</button>
+      <button id="sortCount" onclick="setSort('count')">Combinations</button>
+      <button id="sortVers" class="active" onclick="setSort('versatility')">Versatility</button>
+    </div>
+    <button id="btnRandom" class="btn-group" style="margin-left:8px; font-family:sans-serif; font-size:0.75rem; padding:5px 11px; border:1px solid var(--border); border-radius:var(--radius); background:transparent; color:var(--muted); cursor:pointer;" onclick="selectRandom()">Random</button>
+    <span class="count-info" id="countInfo"></span>
+  </div>
+
+  <div class="gallery-body">
+    <div class="gallery-scroll">
+      <div class="color-grid" id="colorGrid">
+        <div class="no-results">Loading palette data…</div>
+      </div>
+    </div>
+
+    <div class="detail-panel" id="detailPanel">
+      <div class="detail-empty" id="detailEmpty">
+        <span class="detail-empty-icon">⬛</span>
+        <span>Select a color to explore its combinations and similar shades</span>
+      </div>
+      <div class="detail-inner" id="detailInner" style="display:none">
+        <div class="detail-swatch" id="detailSwatch">
+          <button class="detail-close" onclick="closeDetail()">✕</button>
+        </div>
+        <div class="detail-scroll">
+          <div class="detail-name" id="detailName"></div>
+          <div class="detail-index" id="detailIndex"></div>
+
+          <div class="codes-grid">
+            <div class="code-pill" onclick="copyCode('hex')" title="Click to copy">
+              <div class="code-pill-label">HEX</div>
+              <div class="code-pill-value" id="detailHex"></div>
+            </div>
+            <div class="code-pill" onclick="copyCode('rgb')" title="Click to copy">
+              <div class="code-pill-label">RGB</div>
+              <div class="code-pill-value" id="detailRgb"></div>
+            </div>
+            <div class="code-pill" onclick="copyCode('cmyk')" title="Click to copy">
+              <div class="code-pill-label">CMYK</div>
+              <div class="code-pill-value" id="detailCmyk"></div>
+            </div>
+          </div>
+
+          <div class="section-heading">Versatility Score</div>
+          <div class="versatility-row">
+            <div class="v-score" id="detailVScore"></div>
+            <div class="v-info">
+              <div class="v-label" id="detailVLabel"></div>
+              <div class="v-bar"><div class="v-fill" id="detailVBar"></div></div>
+            </div>
+          </div>
+
+          <div class="section-heading" id="combosHeading">Combinations</div>
+          <div id="comboCopyAll" style="font-family:sans-serif; font-size:0.6rem; color:var(--muted); text-align:right; margin-bottom:4px; cursor:pointer; display:none" onclick="copyAllPalettes()">Copy all palettes</div>
+          <div class="combo-list" id="comboList"></div>
+
+          <div class="section-heading">Similar Colors</div>
+          <div class="similar-row" id="similarList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Upload View ────────────────────────────────────────────── -->
+<div id="uploadView" class="view">
+  <div class="upload-inner">
+    <div class="upload-zone" id="uploadZone"
+         ondragover="e=>{e.preventDefault();e.currentTarget.classList.add('drag-over')}"
+         ondragleave="e=>e.currentTarget.classList.remove('drag-over')"
+         ondrop="handleDrop(event)">
+      <div class="upload-icon">🎨</div>
+      <div class="upload-title">Upload an inspiration image</div>
+      <div class="upload-hint">Click anywhere on the image to sample a color and find the closest Wada Sanzo palette</div>
+      <div class="upload-btn-row">
+        <button class="btn-primary" onclick="document.getElementById('fileInput').click()">Choose Image</button>
+      </div>
+      <div class="upload-hint" style="margin-top:8px;font-size:0.72rem">JPEG · PNG · WEBP</div>
+    </div>
+    <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="handleFile(event)">
+
+    <div class="canvas-area" id="canvasArea" style="display:none">
+      <div class="canvas-wrap">
+        <canvas id="imageCanvas"></canvas>
+        <div class="canvas-hint">Click anywhere on the image to sample a color</div>
+      </div>
+      <div class="sample-result" id="sampleResult">
+        <div class="sample-display" id="sampleDisplay" style="display:none">
+          <div class="sample-swatch" id="sampleSwatch"></div>
+          <div class="sample-info">
+            <div class="sample-label">Sampled color</div>
+            <div class="sample-hex" id="sampleHex">—</div>
+            <div class="sample-rgb" id="sampleRgb"></div>
+          </div>
+        </div>
+        <div id="matchList" style="display:none">
+           <div class="match-header">Closest Wada Sanzo Matches</div>
+           <div id="matchItems"></div>
+        </div>
+        <div class="upload-placeholder" id="samplePlaceholder">
+          Click the image to sample a color
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast">Copied!</div>
+
+<script>
+// ── State ─────────────────────────────────────────────────────────
+let allColors = [];
+let comboMap = {};       // comboId -> [colorIndex, ...]
+let colorMap = {};       // colorIndex -> color
+let labCache = {};       // colorIndex -> [L,a,b]
+let versatilityScores = {}; // colorIndex -> score
+let maxVScore = 1;
+let sortMode = 'versatility';
+let selectedColor = null;
+let filteredColors = [];
+
+// ── Boot ──────────────────────────────────────────────────────────
+fetch('./colors.json')
+  .then(r => r.json())
+  .then(data => {
+    allColors = data.colors;
+    buildMaps();
+    computeVersatility();
+    filteredColors = [...allColors];
+    applySort();
+    renderGrid();
+  })
+  .catch(() => {
+    document.getElementById('colorGrid').innerHTML =
+      '<div class="no-results">Could not load colors.json.<br>Please serve this page from a local web server.</div>';
+  });
+
+function buildMaps() {
+  allColors.forEach(c => {
+    colorMap[c.index] = c;
+    labCache[c.index] = rgbToLab(c.rgb_array);
+    c.combinations.forEach(id => {
+      if (!comboMap[id]) comboMap[id] = [];
+      if (!comboMap[id].includes(c.index)) comboMap[id].push(c.index);
+    });
+  });
+}
+
+function computeVersatility() {
+  // Pass 1: Direct combination counts
+  const pass1 = {};
+  allColors.forEach(c => pass1[c.index] = c.use_count);
+
+  // Pass 2: Weighted by immediate neighbors
+  const pass2 = {};
+  allColors.forEach(c => {
+    const neighbors = new Set();
+    c.combinations.forEach(id => {
+      (comboMap[id] || []).forEach(idx => { if (idx !== c.index) neighbors.add(idx); });
+    });
+    let neighborSum = 0;
+    neighbors.forEach(idx => { neighborSum += (pass1[idx] || 0); });
+    const avgNeighbor = neighbors.size > 0 ? neighborSum / neighbors.size : 0;
+    pass2[c.index] = c.use_count + 0.5 * avgNeighbor;
+  });
+
+  // Pass 3: Recursive weighting (the "Advanced" part of PRD 3.2)
+  allColors.forEach(c => {
+    const neighbors = new Set();
+    c.combinations.forEach(id => {
+      (comboMap[id] || []).forEach(idx => { if (idx !== c.index) neighbors.add(idx); });
+    });
+    let neighborSum = 0;
+    neighbors.forEach(idx => { neighborSum += (pass2[idx] || 0); });
+    const avgNeighbor = neighbors.size > 0 ? neighborSum / neighbors.size : 0;
+    versatilityScores[c.index] = c.use_count + 0.5 * avgNeighbor;
+  });
+
+  maxVScore = Math.max(...Object.values(versatilityScores));
+}
+
+// ── Rendering ─────────────────────────────────────────────────────
+function renderGrid() {
+  const grid = document.getElementById('colorGrid');
+  document.getElementById('countInfo').textContent = `${filteredColors.length} of ${allColors.length} colors`;
+
+  if (filteredColors.length === 0) {
+    grid.innerHTML = '<div class="no-results">No colors match your search.</div>';
+    return;
+  }
+
+  grid.innerHTML = filteredColors.map(c => {
+    const score = versatilityScores[c.index] || 0;
+    const scoreLabel = score.toFixed(1);
+    const isSelected = selectedColor?.index === c.index;
+    return `
+      <div class="color-card${isSelected ? ' selected' : ''}"
+           onclick="selectColor(${c.index})"
+           title="${c.name} — ${c.hex}">
+        <div class="card-swatch" style="background:${c.hex}"></div>
+        <div class="card-body">
+          <div class="card-name">${c.name}</div>
+          <div class="card-meta">
+            <span class="card-hex">${c.hex}</span>
+            <span class="card-score">★${scoreLabel}</span>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── Selection & Detail ─────────────────────────────────────────────
+function selectColor(index) {
+  selectedColor = colorMap[index];
+  renderGrid();
+  renderDetail(selectedColor);
+  // On mobile: scroll to top
+  if (window.innerWidth < 768) {
+    document.querySelector('.detail-panel').scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+function selectRandom() {
+  const idx = Math.floor(Math.random() * allColors.length);
+  selectColor(allColors[idx].index);
+}
+
+function closeDetail() {
+  selectedColor = null;
+  renderGrid();
+  document.getElementById('detailEmpty').style.display = '';
+  document.getElementById('detailInner').style.display = 'none';
+}
+
+function renderDetail(c) {
+  document.getElementById('detailEmpty').style.display = 'none';
+  document.getElementById('detailInner').style.display = '';
+
+  document.getElementById('detailSwatch').style.background = c.hex;
+  document.getElementById('detailName').textContent = c.name;
+  document.getElementById('detailIndex').textContent = `Color No. ${c.index}`;
+  document.getElementById('detailHex').textContent = c.hex;
+  document.getElementById('detailRgb').textContent =
+    `${c.rgb_array[0]}, ${c.rgb_array[1]}, ${c.rgb_array[2]}`;
+  document.getElementById('detailCmyk').textContent =
+    `${c.cmyk_array[0]}, ${c.cmyk_array[1]}, ${c.cmyk_array[2]}, ${c.cmyk_array[3]}`;
+
+  // Versatility
+  const score = versatilityScores[c.index] || 0;
+  const pct = Math.round((score / maxVScore) * 100);
+  document.getElementById('detailVScore').textContent = score.toFixed(1);
+  document.getElementById('detailVLabel').textContent =
+    `${c.use_count} direct combination${c.use_count !== 1 ? 's' : ''} · ${pct}th percentile`;
+  document.getElementById('detailVBar').style.width = pct + '%';
+
+  // Combinations
+  const combosHeading = document.getElementById('combosHeading');
+  combosHeading.textContent = `Combinations (${c.combinations.length})`;
+  document.getElementById('comboCopyAll').style.display = c.combinations.length > 0 ? 'block' : 'none';
+
+  const comboList = document.getElementById('comboList');
+  comboList.innerHTML = c.combinations.length === 0
+    ? '<div style="font-family:sans-serif;font-size:0.8rem;color:var(--muted);padding:6px 0">No combinations in this dataset</div>'
+    : c.combinations.map(id => {
+        const members = (comboMap[id] || []).map(i => colorMap[i]).filter(Boolean);
+        const names = members.map(m => m.name).join(' · ');
+        const swatches = members.map(m =>
+          `<div class="combo-swatch" style="background:${m.hex}"></div>`
+        ).join('');
+        const hexes = members.map(m => m.hex).join(', ');
+        return `
+          <div class="combo-row" onclick="selectColor(${members.find(m => m.index !== c.index)?.index || c.index})">
+            <div class="combo-swatches">${swatches}</div>
+            <div class="combo-meta">
+              <div class="combo-id">Palette ${id}</div>
+              <div class="combo-names">${names}</div>
+            </div>
+            <div style="font-size:0.8rem; padding:4px; opacity:0.4" title="Copy hexes" onclick="event.stopPropagation(); copyText('${hexes}')">📋</div>
+          </div>`;
+      }).join('');
+
+  // Similar colors (Delta E in Lab)
+  const similar = findSimilar(c, 5);
+  document.getElementById('similarList').innerHTML = similar.map(s =>
+    `<div class="similar-chip" onclick="selectColor(${s.index})" title="${s.name}">
+       <div class="similar-chip-swatch" style="background:${s.hex}"></div>
+       <div class="similar-chip-name">${s.name}</div>
+     </div>`
+  ).join('');
+}
+
+function copyAllPalettes() {
+  if (!selectedColor) return;
+  const text = selectedColor.combinations.map(id => {
+    const members = (comboMap[id] || []).map(i => colorMap[i]).filter(Boolean);
+    return `Palette ${id}: ${members.map(m => m.hex).join(', ')} (${members.map(m => m.name).join(' · ')})`;
+  }).join('\n');
+  copyText(text);
+}
+
+function copyText(val) {
+  navigator.clipboard.writeText(val).then(() => showToast(`Copied to clipboard`));
+}
+
+// ── Color science ──────────────────────────────────────────────────
+function rgbToLab([r, g, b]) {
+  r /= 255; g /= 255; b /= 255;
+  r = r > 0.04045 ? Math.pow((r + 0.055) / 1.055, 2.4) : r / 12.92;
+  g = g > 0.04045 ? Math.pow((g + 0.055) / 1.055, 2.4) : g / 12.92;
+  b = b > 0.04045 ? Math.pow((b + 0.055) / 1.055, 2.4) : b / 12.92;
+  const X = r * 0.4124 + g * 0.3576 + b * 0.1805;
+  const Y = r * 0.2126 + g * 0.7152 + b * 0.0722;
+  const Z = r * 0.0193 + g * 0.1192 + b * 0.9505;
+  const f = v => v > 0.008856 ? Math.cbrt(v) : 7.787 * v + 16 / 116;
+  const fx = f(X / 0.95047), fy = f(Y / 1.00000), fz = f(Z / 1.08883);
+  return [116 * fy - 16, 500 * (fx - fy), 200 * (fy - fz)];
+}
+
+function deltaE([l1, a1, b1], [l2, a2, b2]) {
+  return Math.sqrt((l1 - l2) ** 2 + (a1 - a2) ** 2 + (b1 - b2) ** 2);
+}
+
+function findSimilar(target, n) {
+  const tLab = labCache[target.index] || rgbToLab(target.rgb_array);
+  return allColors
+    .filter(c => c.index !== target.index)
+    .map(c => ({ ...c, _d: deltaE(tLab, labCache[c.index] || rgbToLab(c.rgb_array)) }))
+    .sort((a, b) => a._d - b._d)
+    .slice(0, n);
+}
+
+function findClosest(rgb, n = 1) {
+  const tLab = rgbToLab(rgb);
+  return allColors
+    .map(c => ({ ...c, _d: deltaE(tLab, labCache[c.index] || rgbToLab(c.rgb_array)) }))
+    .sort((a, b) => a._d - b._d)
+    .slice(0, n);
+}
+
+// ── Search & Sort ─────────────────────────────────────────────────
+function filterColors() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  filteredColors = q
+    ? allColors.filter(c => 
+        c.name.toLowerCase().includes(q) || 
+        c.hex.toLowerCase().includes(q) ||
+        c.index.toString() === q
+      )
+    : [...allColors];
+  applySort();
+  renderGrid();
+}
+
+function setSort(mode) {
+  sortMode = mode;
+  ['sortName', 'sortCount', 'sortVers'].forEach(id =>
+    document.getElementById(id)?.classList.remove('active')
+  );
+  const map = { name: 'sortName', count: 'sortCount', versatility: 'sortVers' };
+  document.getElementById(map[mode])?.classList.add('active');
+  applySort();
+  renderGrid();
+}
+
+function applySort() {
+  if (sortMode === 'name') {
+    filteredColors.sort((a, b) => a.name.localeCompare(b.name));
+  } else if (sortMode === 'count') {
+    filteredColors.sort((a, b) => b.use_count - a.use_count);
+  } else {
+    filteredColors.sort((a, b) => (versatilityScores[b.index] || 0) - (versatilityScores[a.index] || 0));
+  }
+}
+
+// ── Clipboard ─────────────────────────────────────────────────────
+function copyCode(type) {
+  if (!selectedColor) return;
+  let val = '';
+  if (type === 'hex') val = selectedColor.hex;
+  else if (type === 'rgb') val = `rgb(${selectedColor.rgb_array.join(', ')})`;
+  else if (type === 'cmyk') val = `cmyk(${selectedColor.cmyk_array.join(', ')})`;
+  copyText(val);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+// ── View switching ─────────────────────────────────────────────────
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  if (name === 'gallery') {
+    document.getElementById('galleryView').classList.add('active');
+    document.getElementById('navGallery').classList.add('active');
+  } else {
+    document.getElementById('uploadView').classList.add('active');
+    document.getElementById('navUpload').classList.add('active');
+  }
+}
+
+// ── Image Upload & Eyedropper ──────────────────────────────────────
+let uploadedImage = null;
+
+function handleDrop(e) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) loadImageFile(file);
+}
+
+function handleFile(e) {
+  const file = e.target.files[0];
+  if (file) loadImageFile(file);
+}
+
+function loadImageFile(file) {
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = new Image();
+    img.onload = () => {
+      uploadedImage = img;
+      const canvas = document.getElementById('imageCanvas');
+      const maxW = Math.min(img.width, 560);
+      const scale = maxW / img.width;
+      canvas.width = maxW;
+      canvas.height = Math.round(img.height * scale);
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      document.getElementById('uploadZone').style.display = 'none';
+      document.getElementById('canvasArea').style.display = 'flex';
+      document.getElementById('samplePlaceholder').style.display = 'block';
+      document.getElementById('sampleDisplay').style.display = 'none';
+      document.getElementById('matchList').style.display = 'none';
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+document.getElementById('imageCanvas').addEventListener('click', function(e) {
+  const canvas = this;
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const x = Math.round((e.clientX - rect.left) * scaleX);
+  const y = Math.round((e.clientY - rect.top) * scaleY);
+
+  const ctx = canvas.getContext('2d');
+  const px = ctx.getImageData(x, y, 1, 1).data;
+  const rgb = [px[0], px[1], px[2]];
+  const hex = '#' + rgb.map(v => v.toString(16).padStart(2, '0')).join('');
+
+  document.getElementById('sampleSwatch').style.background = hex;
+  document.getElementById('sampleHex').textContent = hex;
+  document.getElementById('sampleRgb').textContent = `rgb(${rgb.join(', ')})`;
+  document.getElementById('sampleDisplay').style.display = 'flex';
+  document.getElementById('samplePlaceholder').style.display = 'none';
+
+  if (allColors.length > 0) {
+    const matches = findClosest(rgb, 3);
+    document.getElementById('matchList').style.display = 'block';
+    const matchItems = document.getElementById('matchItems');
+    matchItems.innerHTML = matches.map((match, i) => {
+      let combosHtml = '';
+      if (i === 0 && match.combinations.length > 0) {
+        const comboPreviews = match.combinations.slice(0, 4).map(id => {
+          const members = (comboMap[id] || []).map(i => colorMap[i]).filter(Boolean);
+          const swatches = members.map(m =>
+            `<div style="width:10px; height:14px; background:${m.hex}"></div>`
+          ).join('');
+          return `<div style="display:flex; border-radius:2px; overflow:hidden; margin-right:3px; margin-bottom:3px; border:1px solid var(--border); cursor:pointer" title="Palette ${id}" onclick="event.stopPropagation(); showMatch(${match.index})">${swatches}</div>`;
+        }).join('');
+        combosHtml = `
+          <div style="margin-top:8px;">
+            <div style="font-size:0.6rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px">Featured Palettes</div>
+            <div style="display:flex; flex-wrap:wrap;">${comboPreviews}</div>
+          </div>`;
+      }
+      return `
+        <div class="match-box" style="display:block; margin-bottom:10px; border-color:${i===0?'var(--accent)':'var(--border)'}">
+          <div class="match-header">${i === 0 ? 'Closest Match' : 'Alternative #' + i}</div>
+          <div class="match-color-row">
+            <div class="match-swatch" style="background:${match.hex}"></div>
+            <div>
+              <div class="match-name">${match.name}</div>
+              <div class="match-hex">${match.hex}</div>
+            </div>
+          </div>
+          ${combosHtml}
+          <button class="match-view-btn" onclick="showMatch(${match.index})">View all ${match.combinations.length} palettes →</button>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Draw crosshair on canvas
+  const ctx2 = canvas.getContext('2d');
+  if (uploadedImage) {
+    ctx2.drawImage(uploadedImage, 0, 0, canvas.width, canvas.height);
+  }
+  ctx2.strokeStyle = 'white';
+  ctx2.lineWidth = 2;
+  ctx2.beginPath();
+  ctx2.arc(x, y, 8, 0, Math.PI * 2);
+  ctx2.stroke();
+  ctx2.strokeStyle = 'rgba(0,0,0,0.6)';
+  ctx2.lineWidth = 1;
+  ctx2.beginPath();
+  ctx2.arc(x, y, 8, 0, Math.PI * 2);
+  ctx2.stroke();
+});
+
+function showMatch(index) {
+  showView('gallery');
+  selectColor(index);
+  document.querySelector('.gallery-scroll').scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
