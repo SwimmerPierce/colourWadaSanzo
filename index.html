@@ -623,7 +623,7 @@
       font-size: 0.9rem;
     }
 
-    /* ── Tooltips ─────────────────────────────────────────────── */
+    /* ── Info Icons ─────────────────────────────────────────────── */
     .info-trigger {
       display: inline-flex;
       align-items: center;
@@ -638,53 +638,11 @@
       cursor: help;
       margin-left: 5px;
       vertical-align: middle;
-      position: relative;
     }
 
     .info-trigger:hover {
       background: var(--border);
       color: var(--text);
-    }
-
-    .tooltip {
-      visibility: hidden;
-      width: 200px;
-      background-color: var(--accent);
-      color: #fff;
-      text-align: left;
-      border-radius: var(--radius);
-      padding: 10px;
-      position: absolute;
-      z-index: 100;
-      bottom: 125%;
-      left: 50%;
-      margin-left: -100px;
-      opacity: 0;
-      transition: opacity 0.2s;
-      font-family: sans-serif;
-      font-size: 0.7rem;
-      font-weight: normal;
-      text-transform: none;
-      letter-spacing: normal;
-      line-height: 1.4;
-      pointer-events: none;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-
-    .tooltip::after {
-      content: "";
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      margin-left: -5px;
-      border-width: 5px;
-      border-style: solid;
-      border-color: var(--accent) transparent transparent transparent;
-    }
-
-    .info-trigger:hover .tooltip {
-      visibility: visible;
-      opacity: 1;
     }
   </style>
 </head>
@@ -758,9 +716,7 @@
 
           <div class="section-heading">
             Versatility Score
-            <span class="info-trigger">?
-              <span class="tooltip">A weighted metric measuring how often this color appears in combinations. High scores indicate "utility" colors that pair effectively across many different palettes in the collection.</span>
-            </span>
+            <span class="info-trigger" title="A weighted metric measuring how often this color appears in combinations. High scores indicate 'utility' colors that pair effectively across many different palettes in the collection.">?</span>
           </div>
           <div class="versatility-row">
             <div class="v-score" id="detailVScore"></div>
@@ -772,9 +728,7 @@
 
           <div class="section-heading" id="combosHeading">
             Combinations
-            <span class="info-trigger">?
-              <span class="tooltip">The specific 2, 3, and 4-color palettes from Sanzo Wada's dictionary that include this color.</span>
-            </span>
+            <span class="info-trigger" title="The specific 2, 3, and 4-color palettes from Sanzo Wada's dictionary that include this color.">?</span>
           </div>
           <div id="comboCopyAll" style="font-family:sans-serif; font-size:0.6rem; color:var(--muted); text-align:right; margin-bottom:4px; cursor:pointer; display:none" onclick="copyAllPalettes()">Copy all palettes</div>
           <div class="combo-list" id="comboList"></div>
